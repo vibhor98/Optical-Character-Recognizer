@@ -1,2 +1,2 @@
 # OCR
-Optical Character Recognizer using MATLAB .
+Optical Character Recognizer using MATLAB.
