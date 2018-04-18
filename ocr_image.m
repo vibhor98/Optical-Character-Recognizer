@@ -1,11 +1,8 @@
 
-colorImage = imread('Disabled_parking.jpg');
-%colorImage;
+colorImage = imread('airport3.jpg');
 I = rgb2gray(colorImage);
-
-% Detect MSER (Maximally Stable Extremal Regions) Regions
 [mserRegions, mserConnComp] = detectMSERFeatures(I, ...
-    'RegionAreaRange', [2000 8000], 'ThresholdDelta', 4);
+    'RegionAreaRange', [200 8000], 'ThresholdDelta', 0.8);
 
 figure
 imshow(I)
@@ -114,11 +111,11 @@ xmax = xmin + bbox(:,3) - 1;
 ymax = ymin + bbox(:,4) - 1;
 
 % Expand the bounded boxes by small amount
-expansionAmount = 0.01;
+expansionAmount = 0.05;
 xmin = (1-expansionAmount) * xmin;
-xmax = (1-expansionAmount) * xmax;
+xmax = (1+expansionAmount) * xmax;
 ymin = (1-expansionAmount) * ymin;
-ymax = (1-expansionAmount) * ymax;
+ymax = (1+expansionAmount) * ymax;
 
 % Clip the boxes to be within the image boundaries
 xmin = max(xmin, 1);
@@ -165,7 +162,7 @@ textBBoxes = [xmin ymin xmax-xmin+1 ymax-ymin+1];
 numRegionsInGroup = histcounts(textBBoxes);
 
 % histcounts divides the given array into bins of overlapping group
-textBBoxes(numRegionsInGroup==1, :) = [];
+%textBBoxes(numRegionsInGroup==1, :) = [];
 % Remove all boxes with no overlapping
 
 % Show final text detection result
@@ -178,11 +175,13 @@ title('Detected text')
 % Recognize characters within the boxes
 ocrText = ocr(I, textBBoxes);
 [ocrText.Text]
+%class([ocrText.Text])
 
 userPrompt = 'What do you want the computer to say?';
 titleBar = 'Text to Speech';
 %defaultString = 'Hello World!  MATLAB is an awesome program!';
-defaultString = [ocrText.Text];
+defaultString = regexprep(char(strcat([ocrText.Text])), '\n+', '');
+class(defaultString)
 caUserInput = inputdlg(userPrompt, titleBar, 1, {defaultString});
 if isempty(caUserInput)
 	return;
